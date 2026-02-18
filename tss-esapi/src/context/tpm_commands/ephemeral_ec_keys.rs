@@ -17,7 +17,7 @@ impl Context {
         p1: EccPoint,
         s2: Option<SensitiveData>,
         y2: Option<EccParameter>,
-    ) -> Result<(EccPoint, EccPoint, EccPoint, u16)>{
+    ) -> Result<(EccPoint, EccPoint, EccPoint, u16), E>{
 
         let mut k_ptr = ptr::null_mut();
         let mut l_ptr = ptr::null_mut();
@@ -46,9 +46,9 @@ impl Context {
             },
         )?;
         Ok((
-            EccPoint::try_from(Context::ffi_data_to_owned(k_ptr)?)?,
-            EccPoint::try_from(Context::ffi_data_to_owned(l_ptr)?)?,
-            EccPoint::try_from(Context::ffi_data_to_owned(e_ptr)?)?,
+            EccPoint::try_from(Context::ffi_data_to_owned(k_ptr)?.point)?,
+            EccPoint::try_from(Context::ffi_data_to_owned(l_ptr)?.point)?,
+            EccPoint::try_from(Context::ffi_data_to_owned(e_ptr)?.point)?,
             counter
             ))
     }
