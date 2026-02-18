@@ -17,7 +17,7 @@ impl Context {
         p1: EccPoint,
         s2: Option<SensitiveData>,
         y2: Option<EccParameter>,
-    ) -> Result<(EccPoint, EccPoint, EccPoint, u16), E>{
+    ) -> Result<(EccPoint, EccPoint, EccPoint, u16), Self::Error>{
 
         let mut k_ptr = ptr::null_mut();
         let mut l_ptr = ptr::null_mut();
