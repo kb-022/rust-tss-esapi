@@ -4,7 +4,7 @@
 use std::ptr;
 use log::error;
 
-use crate::{Context, ReturnCode};
+use crate::{tss2_esys, Context, ReturnCode};
 use crate::handles::KeyHandle;
 use crate::structures::{EccParameter, EccPoint, SensitiveData};
 use crate::tss2_esys::{Esys_Commit};
@@ -17,7 +17,7 @@ impl Context {
         p1: EccPoint,
         s2: Option<SensitiveData>,
         y2: Option<EccParameter>,
-    ) -> (EccPoint, EccPoint, EccPoint, u16) {
+    ) -> Result<(EccPoint, EccPoint, EccPoint, u16), crate::error::Error> {
 
         let mut k_ptr = ptr::null_mut();
         let mut l_ptr = ptr::null_mut();
@@ -45,11 +45,14 @@ impl Context {
                 error!("Error when commiting: {:#010X}", ret);
             },
         )?;
-        (
-            EccPoint::try_from(Context::ffi_data_to_owned(k_ptr)?.point)?,
-            EccPoint::try_from(Context::ffi_data_to_owned(l_ptr)?.point)?,
-            EccPoint::try_from(Context::ffi_data_to_owned(e_ptr)?.point)?,
-            counter
-        )
+        let out_k = Context::ffi_data_to_owned(k_ptr)?;
+        let out_l = Context::ffi_data_to_owned(l_ptr)?;
+        let out_e = Context::ffi_data_to_owned(e_ptr)?;
+        Ok((
+            EccPoint::try_from(out_k.point)?,
+            EccPoint::try_from(out_l.point)?,
+            EccPoint::try_from(out_e.point)?,
+            counter,
+        ))
     }
 }
